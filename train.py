@@ -1,5 +1,4 @@
 # metapath2vec train code
-
 import os
 import platform
 import argparse
@@ -9,7 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from sklearn.manifold import TSNE
-import torch
 from torch_geometric.datasets import AMiner
 from torch_geometric.nn import MetaPath2Vec
 
@@ -17,15 +15,21 @@ from utils import *
 
 
 # w1) start a new run
-wandb.init(project="metapath2vec-train", entity="youyoung")
+wandb.init(
+    project="metapath2vec-train", entity="youyoung",
+    tags=["gnn", "embedding"],
+    notes=" "
+)
 
 # w1) set run-name
 ap = argparse.ArgumentParser(description="metapath2vec argparser")
 ap.add_argument("--run-name", "-rn", type=str, default="new run", help="string for wandb run-name")
+ap.add_argument("--epochs", "-e", type=int, default=5, help="# epochs")
 args = ap.parse_args()
 
 wandb.run.name = args.run_name
-wandb.run.save()
+
+EPOCHS = args.epochs
 
 
 # load the data
@@ -87,8 +91,6 @@ loader = model.loader(batch_size=128, shuffle=True, num_workers=num_workers)
 optimizer = torch.optim.SparseAdam(
     list(model.parameters()), lr=LR, betas=(0.9, 0.999), eps=1e-08)
 
-EPOCHS = 5
-
 
 # define train/test code
 def train(epoch):
@@ -110,7 +112,7 @@ def train(epoch):
         loop.set_postfix(loss=mean_loss)
 
         # w4) log
-        wandb.log({'mean loss per epoch': mean_loss})
+        wandb.log({'Train Loss (mean)': mean_loss})
 
 
 @torch.no_grad()
@@ -149,10 +151,10 @@ def visualize_venue_emb_vec(epoch):
     df['x_coor'], df['y_coor'] = z[:, 0], z[:, 1]
 
     sns.set(style="darkgrid")
-    fig, ax = plt.subplots(figsize=(8, 8))
+    fig, ax = plt.subplots(figsize=(12, 12))
     sns.scatterplot(
-        x="x_coor", y="y_coor", hue=df.label.tolist(), legend="brief",
-        palette=sns.color_palette("hls", 8),
+        x="x_coor", y="y_coor", hue=df.label.tolist(), legend="full",
+        palette="Paired_r",
         data=df).set(title=f"Vis of venue emb_vec: epoch{epoch}")
 
     # w4) log
@@ -164,7 +166,7 @@ def main():
         train(epoch)
         acc = test()
         # w4) log
-        wandb.log({'test acc per epoch': acc})
+        wandb.log({'Test Accuracy': acc})
         print(f'Test Accuracy after epoch {epoch}: {acc:.4f}')
 
         visualize_venue_emb_vec(epoch)
