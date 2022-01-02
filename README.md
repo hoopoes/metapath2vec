@@ -28,10 +28,10 @@ To run the code, you need the following dependencies:
 - torch-scatter==2.0.9  
 - torch-sparse==0.6.12  
 
-You might not need the exact version.  
+You may not need the exact version.  
 
 ## Usage  
-Execute the following scripts to train `metapath2vec`:  
+Execute the following script to train `metapath2vec`:  
 
 ```python
 python train.py -rn run_name -e num_epochs
@@ -48,10 +48,10 @@ My experiments were conducted on a machine with a **NVIDIA GeForce RTX 3070 Ti**
 After running 15 epochs, the results are as follows:  
 
 **Train Loss Plot**  
-<center><img src="/img/train_loss.png" width="80%"></center>  
+<center><img src="/img/train_loss.png" width="60%"></center>  
 
 **Test Accuracy Plot**  
-<center><img src="/img/train_loss.png" width="80%"></center>  
+<center><img src="/img/test_acc.png" width="60%"></center>  
 
 **Visualization of venue embedding vector**  
 Embedding vectors are compressed using `tsne` algorithm.  
